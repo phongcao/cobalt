@@ -31,15 +31,4 @@ locals {
 
   // Resolved resource names
   app_rg_name         = "${local.base_name_83}-app-rg" // app resource group (max 90 chars)
-  sp_name             = "${local.base_name}-sp"        // service plan
-  app_svc_name_prefix = local.base_name_21
-
-  // Resolved TF Vars
-  reg_url = var.docker_registry_server_url
-  app_services = {
-    for target in var.deployment_targets :
-    target.app_name => {
-      image = "${target.image_name}:${target.image_release_tag_prefix}"
-    }
-  }
 }

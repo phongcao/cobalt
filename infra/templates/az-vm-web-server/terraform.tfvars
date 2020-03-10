@@ -7,16 +7,5 @@
 # the `name` variable or increasing the value for `randomization_level`.
 
 resource_group_location = "eastus"
-name                    = "az-hello-world"
+name                    = "az-vm-web-server"
 randomization_level     = 8
-
-deployment_targets = [{
-  app_name                 = "cobalt-backend-api",
-  image_name               = "appsvcsample/static-site",
-  image_release_tag_prefix = "latest"
-}]
-
-app_service_settings = {
-  app_setting1 = "hw_setting_value",
-  app_setting2 = "hw_setting_value"
-}

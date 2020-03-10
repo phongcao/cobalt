@@ -1,4 +1,3 @@
-output "app_service_default_hostname" {
-  value = "https://${element(module.app_service.app_service_uris, 0)}"
+output "vm_default_hostname" {
+  value = "0.0.0.0"
 }
-
