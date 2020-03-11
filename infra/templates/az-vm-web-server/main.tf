@@ -57,6 +57,14 @@ resource "azurerm_subnet" "sn" {
   address_prefix       = "10.1.0.0/24"
 }
 
+resource "azurerm_public_ip" "pip_webserver" {
+  name                    = "internal"
+  location                = azurerm_resource_group.main.location
+  resource_group_name     = azurerm_resource_group.main.name
+  allocation_method       = "Dynamic"
+  idle_timeout_in_minutes = 30
+}
+
 resource "azurerm_network_interface" "nic_webserver" {
   name                = var.azurerm_network_interface_name
   location            = azurerm_resource_group.main.location
@@ -67,6 +75,7 @@ resource "azurerm_network_interface" "nic_webserver" {
     name                          = "webserver-static-ip"
     subnet_id                     = azurerm_subnet.sn.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.pip_webserver.id
   }
 }
 
@@ -79,7 +88,7 @@ resource "azurerm_virtual_machine" "vm_webserver" {
   name                  = local.vm_name
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
-  network_interface_ids = ["${azurerm_network_interface.nic_webserver.id}"]
+  network_interface_ids = [ azurerm_network_interface.nic_webserver.id ]
   vm_size               = "Standard_DS2_v2"
   
   delete_os_disk_on_termination = true
@@ -105,5 +114,30 @@ resource "azurerm_virtual_machine" "vm_webserver" {
       key_data = tls_private_key.vm_webserver_private_key.public_key_openssh
       path = "/home/${var.os_profile_admin_username}/.ssh/authorized_keys"
     }     
+  }
+}
+
+data "azurerm_public_ip" "ip_webserver" {
+  name                = azurerm_public_ip.pip_webserver.name
+  resource_group_name = azurerm_resource_group.main.name
+  depends_on          = [ "azurerm_virtual_machine.vm_webserver" ]
+}
+
+resource "null_resource" "docker" {
+  provisioner "remote-exec" {
+    # Install Docker
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install docker.io -y",
+      "sudo groupadd docker",
+      "sudo usermod -aG docker $(whoami)",
+      "sudo service docker restart"
+    ]
+    connection {
+      type        = "ssh"
+      user        = var.os_profile_admin_username
+      private_key = tls_private_key.vm_webserver_private_key.private_key_pem
+      host        = data.azurerm_public_ip.ip_webserver.ip_address
+    }
   }
 }
