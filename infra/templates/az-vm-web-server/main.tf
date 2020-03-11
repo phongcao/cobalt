@@ -131,7 +131,8 @@ resource "null_resource" "docker" {
       "sudo apt-get install docker.io -y",
       "sudo groupadd docker",
       "sudo usermod -aG docker $(whoami)",
-      "sudo service docker restart"
+      "sudo service docker restart",
+      "sudo docker run -P -d -p 80:80 nginxdemos/hello"
     ]
     connection {
       type        = "ssh"
