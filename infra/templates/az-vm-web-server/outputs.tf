@@ -1,4 +1,4 @@
 output "webserver_ip" {
-  value       = "${data.azurerm_public_ip.ip_webserver.ip_address}"
+  value       = module.linux_web_server.web_server_public_ip
   description = "The ip address of the web server."
 }

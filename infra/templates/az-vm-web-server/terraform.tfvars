@@ -9,9 +9,5 @@
 resource_group_location             = "eastus"
 name                                = "az-vm-web-server"
 randomization_level                 = 8
-os_profile_computer_name            = "webservervm"
-os_profile_admin_username           = "webservervm"
-storage_os_disk_name                = "dskmain"
-azurerm_network_security_group_name = "nsgmain"
-azurerm_network_interface_name      = "nicmain"
-azurerm_virtual_network_name        = "vnetmain"
+vm_name                             = "webservervm"
+vm_size                             = "Standard_DS2_v2"
